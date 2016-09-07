@@ -21,12 +21,7 @@ class ViewController: UIViewController, EmptyStateController {
 
 			self.showEmptyState(image, message: message)
 		}
-		
-
+	
 	}
-
-
-
-
 }
 
