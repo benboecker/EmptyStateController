@@ -1,3 +1,10 @@
+//
+//  ViewController.swift
+//  EmptyView
+//
+//  Created by Benni on 06.09.16.
+//  Copyright © 2016 Ben Boecker. All rights reserved.
+//
 
 import UIKit
 
@@ -5,26 +12,38 @@ protocol EmptyStateController {}
 
 extension EmptyStateController where Self: UIViewController {
 
+	/// Tag value to identify the `EmptyView` in the view controller's view hierarchy.
+	var emptyViewTag: Int {
+		return 52683
+	}
+
 	func showEmptyState(image: UIImage, message: String) {
-		if let view = self.view.viewWithTag(243) {
+		if let view = self.view.viewWithTag(self.emptyViewTag) {
 			view.removeFromSuperview()
 		}
 
 		let emptyView = EmptyView(image: image, message: message)
-		self.view.addSubview(emptyView)
+		emptyView.tag = self.emptyViewTag
+		emptyView.frame = CGRect(x: 0, y: 0, width: 300, height: 500)
+		emptyView.center = self.view.center
 
-		let constraintWidth = NSLayoutConstraint(item: emptyView, attribute: .Width, relatedBy: .Equal, toItem: self.view, attribute: .Width, multiplier: 0.75, constant: 0)
+		if let navController = self.navigationController {
+			emptyView.center.offset(CGSize(width: 0, height: navController.navigationBar.bounds.height))
+			navController.view.addSubview(emptyView)
+		} else {
+			self.view.addSubview(emptyView)
+		}
 
-		let constraintHeight = NSLayoutConstraint(item: emptyView, attribute: .Height, relatedBy: .Equal, toItem: self.view, attribute: .Height, multiplier: 0.6, constant: 0)
+		if self is UITableViewController {
+			(self as? UITableViewController)?.tableView.tableFooterView = UIView()
+		}
+	}
+}
 
-		let centerX = NSLayoutConstraint(item: emptyView, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-
-		let centerY = NSLayoutConstraint(item: emptyView, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 0)
-
-		self.view.addConstraint(constraintWidth)
-		self.view.addConstraint(constraintHeight)
-		self.view.addConstraint(centerX)
-		self.view.addConstraint(centerY)
+private extension CGPoint {
+	mutating func offset(offset: CGSize) {
+		self.x += offset.width
+		self.y += offset.height
 	}
 }
 
@@ -53,9 +72,6 @@ private class EmptyView : UIView {
 
 	init(image: UIImage, message: String, config: EmptyViewConfig = EmptyViewConfig.defaultConfig) {
 		super.init(frame: CGRect.zero)
-
-		self.translatesAutoresizingMaskIntoConstraints = false
-		self.tag = 243
 
 		let imageView = UIImageView(image: image)
 		imageView.contentMode = .ScaleAspectFit
