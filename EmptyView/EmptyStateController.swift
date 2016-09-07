@@ -38,6 +38,15 @@ extension EmptyStateController where Self: UIViewController {
 			(self as? UITableViewController)?.tableView.tableFooterView = UIView()
 		}
 	}
+
+	func hideEmptyState() {
+		if let view = self.view.viewWithTag(self.emptyViewTag) {
+			view.removeFromSuperview()
+		}
+		if let view = self.navigationController?.view.viewWithTag(self.emptyViewTag) {
+			view.removeFromSuperview()
+		}
+	}
 }
 
 private extension CGPoint {
